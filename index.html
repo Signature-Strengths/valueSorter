@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Core Values Sorter – Signature Strengths</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #f2f2f0; font-family: 'DM Sans', sans-serif; color: #1c2b2b; min-height: 100vh; padding: 24px 16px; }
+    .app { max-width: 1100px; margin: 0 auto; }
+
+    /* Header */
+    .header { background: #ffffff; border: 1px solid #e4ecea; border-radius: 14px; padding: 20px 24px; margin-bottom: 14px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+    .header-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .brand { font-size: 13px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #1c2b2b; margin-bottom: 2px; }
+    .brand-sub { font-size: 12px; color: #7a9090; letter-spacing: 0.04em; margin-bottom: 10px; }
+    .header h1 { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 700; color: #1c2b2b; line-height: 1.2; }
+    .header p { font-size: 13px; color: #7a9090; margin-top: 4px; }
+    .stats { display: flex; gap: 8px; }
+    .stat { background: #f4f9f8; border: 1px solid #daeee9; border-radius: 10px; padding: 8px 18px; text-align: center; }
+    .stat .num { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 700; color: #3d8c7e; }
+    .stat .lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 0.07em; color: #9ab5af; font-weight: 600; }
+    .actions { display: flex; align-items: center; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+    .reset-btn { background: #ffffff; color: #1c2b2b; border: 1px solid #c8d8d4; border-radius: 6px; padding: 7px 16px; font-weight: 600; font-size: 12px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background 0.15s; }
+    .reset-btn:hover { background: #f0f7f5; }
+    .msg { font-size: 12px; color: #3d8c7e; background: #edf7f5; border: 1px solid #b8ddd7; border-radius: 6px; padding: 5px 12px; display: none; }
+
+    /* Layout */
+    .grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    @media(min-width: 720px) { .grid { grid-template-columns: 1fr 2fr; } }
+
+    /* Bank panel */
+    .panel { background: #ffffff; border: 1px solid #e4ecea; border-radius: 14px; padding: 16px; display: flex; flex-direction: column; box-shadow: 0 1px 6px rgba(0,0,0,0.04); }
+    .panel-title { font-family: 'Cormorant Garamond', serif; font-size: 17px; font-weight: 700; color: #1c2b2b; margin-bottom: 10px; }
+    .bank-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px; max-height: 380px; overflow-y: auto; padding-right: 2px; flex: 1; }
+    .bank-grid::-webkit-scrollbar { width: 4px; }
+    .bank-grid::-webkit-scrollbar-thumb { background: #c8ddd9; border-radius: 99px; }
+
+    /* Add row */
+    .add-row { display: flex; gap: 6px; margin-top: 10px; }
+    .add-input { flex: 1; background: #f4f9f8; border: 1px solid #c8d8d4; border-radius: 6px; padding: 7px 12px; color: #1c2b2b; font-size: 12px; font-family: 'DM Sans', sans-serif; outline: none; }
+    .add-input::placeholder { color: #a8bfbb; }
+    .add-input:focus { border-color: #3d8c7e; background: #fff; }
+    .add-btn { background: #3d8c7e; color: #ffffff; border: none; border-radius: 6px; padding: 7px 14px; font-weight: 600; font-size: 12px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background 0.15s; white-space: nowrap; }
+    .add-btn:hover { background: #337569; }
+
+    /* Drop zones */
+    .zones-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 10px; }
+    .zone { background: #f8fcfb; border: 1.5px dashed #c8d8d4; border-radius: 12px; padding: 10px; min-height: 130px; transition: background 0.18s, border-color 0.18s; }
+    .zone.drag-over { background: #edf7f5; border-color: #3d8c7e; }
+    .zone-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .zone-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.09em; color: #9ab5af; }
+    .zone-badge { background: #e4ecea; color: #7a9090; border-radius: 99px; padding: 1px 8px; font-size: 11px; font-weight: 600; }
+    .zone.drag-over .zone-badge { background: #b8ddd7; color: #2a6358; }
+
+    /* Value cards */
+    .value-card { background: #ffffff; color: #1c2b2b; border-radius: 7px; padding: 8px 10px; margin-bottom: 5px; font-size: 12px; font-weight: 500; cursor: grab; display: flex; align-items: center; justify-content: space-between; gap: 6px; border: 1px solid #e4ecea; transition: transform 0.12s, box-shadow 0.12s, border-color 0.12s; user-select: none; }
+    .value-card:hover { box-shadow: 0 3px 10px rgba(61,140,126,0.1); transform: translateY(-1px); border-color: #a8cec8; }
+    .value-card:active { cursor: grabbing; }
+    .value-card.dragging { opacity: 0.28; transform: scale(0.96); }
+    .value-card.custom { border-color: #b8ddd7; background: #f4faf9; }
+    .card-name { flex: 1; cursor: pointer; }
+    .card-name strong { font-weight: 600; font-size: 12px; display: block; color: #1c2b2b; }
+    .card-hint { font-size: 10px; color: #b0c8c4; display: block; margin-top: 1px; }
+    .value-card.custom .card-hint { color: #5aaa98; }
+    .star-btn { background: none; border: none; cursor: pointer; font-size: 15px; color: #3d8c7e; padding: 0 2px; line-height: 1; transition: transform 0.12s; }
+    .star-btn:hover { transform: scale(1.2); }
+    .del-btn { background: none; border: none; cursor: pointer; font-size: 12px; color: #ccc; padding: 0 2px; line-height: 1; transition: color 0.12s; }
+    .del-btn:hover { color: #c0392b; }
+
+    /* Top 5 */
+    .top5-section { background: #ffffff; border: 1px solid #e4ecea; border-radius: 14px; padding: 14px; box-shadow: 0 1px 6px rgba(0,0,0,0.04); }
+    .top5-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .top5-title { font-family: 'Cormorant Garamond', serif; font-size: 16px; font-weight: 700; color: #1c2b2b; }
+    .top5-badge { font-size: 11px; color: #ffffff; background: #3d8c7e; border-radius: 6px; padding: 3px 10px; font-weight: 600; }
+    .top5-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+    @media(max-width: 600px) { .top5-grid { grid-template-columns: repeat(2, 1fr); } }
+    .top5-slot { background: #f8fcfb; border: 1.5px dashed #c8d8d4; border-radius: 8px; padding: 8px 4px; text-align: center; font-size: 11px; font-weight: 500; color: #b0c8c4; min-height: 50px; display: flex; align-items: center; justify-content: center; }
+    .top5-slot.filled { background: #edf7f5; border-color: #3d8c7e; border-style: solid; color: #2a6358; font-weight: 700; }
+
+    /* Modal overlay */
+    .overlay { position: fixed; inset: 0; background: rgba(28,43,43,0.45); z-index: 100; display: flex; align-items: center; justify-content: center; }
+    .modal { background: #fff; color: #1c2b2b; border-radius: 14px; padding: 28px; max-width: 300px; width: 90%; text-align: center; border: 1px solid #e4ecea; box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+    .modal h2 { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 700; margin-bottom: 8px; text-transform: capitalize; }
+    .modal .teal-line { width: 28px; height: 2.5px; background: #3d8c7e; border-radius: 2px; margin: 0 auto 12px; }
+    .modal p { font-size: 13px; line-height: 1.65; color: #5a7a76; }
+    .modal .close-btn { margin-top: 18px; background: #3d8c7e; border: none; border-radius: 6px; padding: 9px 22px; font-weight: 600; cursor: pointer; color: #fff; font-family: 'DM Sans', sans-serif; font-size: 13px; transition: background 0.15s; }
+    .modal .close-btn:hover { background: #337569; }
+
+    /* Footer */
+    .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #9ab5af; }
+    .footer a { color: #3d8c7e; text-decoration: none; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="header">
+      <div class="header-row">
+        <div>
+          <div class="brand">Ahmed Abouserie</div>
+          <div class="brand-sub">Transformational Coach</div>
+          <h1>Core Values Sorter</h1>
+          <p>Drag cards into the zones. Tap a value to learn more.</p>
+        </div>
+        <div class="stats">
+          <div class="stat"><div class="num" id="s-bank">20</div><div class="lbl">Unsorted</div></div>
+          <div class="stat"><div class="num" id="s-ess">0</div><div class="lbl">Essential</div></div>
+          <div class="stat"><div class="num" id="s-top">0/5</div><div class="lbl">Top 5</div></div>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="reset-btn" onclick="resetAll()">↺ Reset sort</button>
+        <span class="msg" id="msg-box"></span>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="panel">
+        <div class="panel-title">Values to sort</div>
+        <div class="bank-grid" id="bank-list"
+          ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event,'bank')"></div>
+        <div class="add-row">
+          <input class="add-input" id="add-input" type="text" placeholder="Add a missing value…" maxlength="32" onkeydown="if(event.key==='Enter') addValue()" />
+          <button class="add-btn" onclick="addValue()">+ Add</button>
+        </div>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div class="zones-row">
+          <div class="zone" ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event,'essential')">
+            <div class="zone-head"><span class="zone-label">Essential</span><span class="zone-badge" id="b-ess">0</span></div>
+            <div id="list-essential"></div>
+          </div>
+          <div class="zone" ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event,'important')">
+            <div class="zone-head"><span class="zone-label">Important</span><span class="zone-badge" id="b-imp">0</span></div>
+            <div id="list-important"></div>
+          </div>
+          <div class="zone" ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event,'nice')">
+            <div class="zone-head"><span class="zone-label">Nice to Have</span><span class="zone-badge" id="b-nice">0</span></div>
+            <div id="list-nice"></div>
+          </div>
+        </div>
+        <div class="top5-section">
+          <div class="top5-head">
+            <div class="top5-title">Your Top 5 Essential Values</div>
+            <span class="top5-badge" id="top5-badge">0 selected</span>
+          </div>
+          <div class="top5-grid" id="top5-grid"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      A tool by <a href="https://www.signature-strengths.com" target="_blank">Signature Strengths</a> · Ahmed Abouserie
+    </div>
+  </div>
+
+  <script>
+    const DEFAULTS = ["autonomy","justice","depth","impact","security","belonging","freedom","creativity","recognition","growth","community","integrity","contribution","learning","flexibility","stability","meaning","challenge","connection","influence"];
+    const DESCS = {
+      autonomy:"Having choice, self-direction, and room to decide.",
+      justice:"Fairness, equity, and doing what is right.",
+      depth:"Going beneath the surface with focus and substance.",
+      impact:"Making a meaningful difference through your actions.",
+      security:"Feeling safe, prepared, and protected.",
+      belonging:"Feeling accepted, included, and at home.",
+      freedom:"Having openness, possibility, and independence.",
+      creativity:"Making, imagining, and expressing original ideas.",
+      recognition:"Being seen, appreciated, and acknowledged.",
+      growth:"Developing, evolving, and becoming more capable.",
+      community:"Being part of a supportive shared group.",
+      integrity:"Acting honestly and staying aligned with principles.",
+      contribution:"Giving something useful, generous, or meaningful.",
+      learning:"Exploring, understanding, and gaining new insight.",
+      flexibility:"Adapting with ease and having options.",
+      stability:"Consistency, reliability, and steady ground.",
+      meaning:"Feeling purpose, significance, and deeper reason.",
+      challenge:"Stretching yourself through worthy difficulty.",
+      connection:"Building closeness, trust, and shared understanding.",
+      influence:"Shaping decisions, direction, or outcomes."
+    };
+
+    const state = { bank:[...DEFAULTS], essential:[], important:[], nice:[], topFive:[], custom:[] };
+    let dragging = null, msgTimer = null;
+
+    function cap(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
+
+    function showMsg(t){
+      const b = document.getElementById('msg-box');
+      b.textContent = t; b.style.display = 'inline-block';
+      clearTimeout(msgTimer);
+      msgTimer = setTimeout(() => b.style.display = 'none', 2500);
+    }
+
+    function isCustom(v){ return state.custom.includes(v); }
+
+    function addValue(){
+      const inp = document.getElementById('add-input');
+      const raw = inp.value.trim(); if(!raw) return;
+      const key = raw.toLowerCase();
+      const all = [...state.bank,...state.essential,...state.important,...state.nice];
+      if(all.includes(key)){ showMsg('"'+cap(key)+'" already exists.'); inp.value=''; return; }
+      state.custom.unshift(key);
+      DESCS[key] = 'A custom value you added.';
+      state.bank.unshift(key);
+      inp.value=''; render();
+      showMsg('"'+cap(key)+'" added!');
+    }
+
+    function deleteValue(val, e){
+      e.stopPropagation();
+      ['bank','essential','important','nice'].forEach(z => { state[z] = state[z].filter(x => x !== val); });
+      state.topFive = state.topFive.filter(x => x !== val);
+      state.custom = state.custom.filter(x => x !== val);
+      delete DESCS[val]; render();
+      showMsg('"'+cap(val)+'" removed.');
+    }
+
+    function makeCard(val, zone){
+      const isEss = zone === 'essential', isTop = state.topFive.includes(val), custom = isCustom(val);
+      const d = document.createElement('div');
+      d.className = 'value-card' + (custom ? ' custom' : ''); d.draggable = true;
+      d.innerHTML = `<span class="card-name" onclick="showDesc('${val}')"><strong>${cap(val)}</strong><span class="card-hint">${custom ? 'custom · tap to edit' : 'tap to learn more'}</span></span><button class="star-btn" onclick="toggleTop('${val}',event)" style="display:${isEss?'inline':'none'}">${isTop?'★':'☆'}</button>${custom?`<button class="del-btn" onclick="deleteValue('${val}',event)">✕</button>`:''}`;
+      d.addEventListener('dragstart', () => { dragging = val; setTimeout(() => d.classList.add('dragging'), 0); });
+      d.addEventListener('dragend', () => { dragging = null; d.classList.remove('dragging'); });
+      return d;
+    }
+
+    function render(){
+      const zones = { bank:'bank-list', essential:'list-essential', important:'list-important', nice:'list-nice' };
+      Object.entries(zones).forEach(([z, id]) => {
+        const el = document.getElementById(id); el.innerHTML = '';
+        (z === 'bank' ? state.bank : state[z]).forEach(v => el.appendChild(makeCard(v, z)));
+      });
+      renderTop5();
+      document.getElementById('s-bank').textContent = state.bank.length;
+      document.getElementById('s-ess').textContent = state.essential.length;
+      document.getElementById('s-top').textContent = state.topFive.length + '/5';
+      document.getElementById('b-ess').textContent = state.essential.length;
+      document.getElementById('b-imp').textContent = state.important.length;
+      document.getElementById('b-nice').textContent = state.nice.length;
+      document.getElementById('top5-badge').textContent = state.topFive.length + ' selected';
+    }
+
+    function renderTop5(){
+      const g = document.getElementById('top5-grid'); g.innerHTML = '';
+      for(let i = 0; i < 5; i++){
+        const v = state.topFive[i];
+        const s = document.createElement('div');
+        s.className = 'top5-slot' + (v ? ' filled' : '');
+        s.textContent = v ? (i+1)+'. '+cap(v) : (i+1)+'. —';
+        g.appendChild(s);
+      }
+    }
+
+    function moveVal(val, target){
+      ['bank','essential','important','nice'].forEach(z => { state[z] = state[z].filter(x => x !== val); });
+      state[target].push(val);
+      if(target !== 'essential') state.topFive = state.topFive.filter(x => x !== val);
+      render();
+    }
+
+    function toggleTop(val, e){
+      e.stopPropagation();
+      if(!state.essential.includes(val)) return;
+      if(state.topFive.includes(val)){
+        state.topFive = state.topFive.filter(x => x !== val);
+        showMsg(cap(val)+' removed from top 5.');
+      } else {
+        if(state.topFive.length >= 5){ showMsg('Already 5 selected — remove one first.'); return; }
+        state.topFive.push(val); showMsg(cap(val)+' added to top 5!');
+      }
+      render();
+    }
+
+    function showDesc(val){
+      const ov = document.createElement('div'); ov.className = 'overlay';
+      ov.innerHTML = `<div class="modal"><h2>${cap(val)}</h2><div class="teal-line"></div><p>${DESCS[val]||'A value you added.'}</p><button class="close-btn" onclick="this.closest('.overlay').remove()">Close</button></div>`;
+      ov.addEventListener('click', e => { if(e.target === ov) ov.remove(); });
+      document.body.appendChild(ov);
+    }
+
+    function onDragOver(e){ e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
+    function onDragLeave(e){ e.currentTarget.classList.remove('drag-over'); }
+    function onDrop(e, zone){ e.preventDefault(); e.currentTarget.classList.remove('drag-over'); if(dragging) moveVal(dragging, zone); }
+
+    function resetAll(){
+      state.bank = [...state.custom, ...DEFAULTS]; state.essential = []; state.important = []; state.nice = []; state.topFive = [];
+      render(); showMsg('All cards reset to unsorted.');
+    }
+
+    render();
+  </script>
+</body>
+</html>
